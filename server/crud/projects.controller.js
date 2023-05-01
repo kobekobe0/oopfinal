@@ -96,6 +96,7 @@ const CreateProjectMembersCreator = async (req, res) => {
     } catch (err) {}
 }
 
+//--------ADDING MEMBERS TO PROJECTS--------//
 const CheckIfUserInProject = async (req, res, next) => {
     const { projectId, assigneeId } = req.body
     try {
@@ -244,10 +245,165 @@ const CreateProjectMember = async (req, res) => {
     }
 }
 
+//----------MAKING A MEMBER AN ADMIN----------//
+// projectId, assigneeId, role, userId
+//check if user in project
+const CheckIfUserMember = async (req, res, next) => {
+    const { projectId, assigneeId } = req.body
+    try {
+        const connection = mysql.createConnection({
+            host: '127.0.0.1',
+            user: 'root',
+            password: 'admin123',
+            database: 'bug_tracker',
+            multipleStatements: true,
+        })
+
+        connection.connect((err) => {
+            if (err) throw err
+        })
+
+        const checkIfExists = () => {
+            return new Promise((resolve, reject) => {
+                connection.query(
+                    `SELECT * FROM project_members WHERE project_id = ${projectId} AND member_id = ${assigneeId}`,
+                    (err, results, fields) => {
+                        if (err) reject(err)
+                        resolve(results)
+                        connection.end()
+                    }
+                )
+            })
+        }
+        checkIfExists().then((results) => {
+            console.log(results)
+            if (results.length > 0) {
+                return next()
+            } else {
+                console.log('User is not in the project')
+                res.status(500).json({
+                    message: 'User is not in the project',
+                    success: false,
+                })
+            }
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}
+//call CheckIfUserAdmin first before this
+const ChangeMemberRole = async (req, res) => {
+    const { assigneeId, role } = req.body
+    const { projectId } = req.myObject
+    try {
+        const connection = mysql.createConnection({
+            host: '127.0.0.1',
+            user: 'root',
+            password: 'admin123',
+            database: 'bug_tracker',
+            multipleStatements: true,
+        })
+
+        connection.connect((err) => {
+            if (err) throw err
+        })
+
+        const changeRole = () => {
+            return new Promise((resolve, reject) => {
+                connection.query(
+                    `UPDATE project_members SET role = '${role}' WHERE project_id = ${projectId} AND member_id = ${assigneeId};`,
+                    (err, results, fields) => {
+                        if (err) reject(err)
+                        resolve(results)
+                        connection.end()
+                    }
+                )
+            })
+        }
+
+        changeRole().then((results) => {
+            console.log(results)
+            if (results.changedRows > 0) {
+                res.status(200).json({
+                    message: 'Member role changed successfully',
+                    success: true,
+                })
+            } else {
+                //FIX - not working
+                res.status(500).json({
+                    message: `User is already a ${role} in the project`,
+                    success: false,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message })
+    }
+}
+
+//----------DELETING A MEMBER----------//
+//only admin can delete a member
+//projectId, assigneeId, userId
+//check if user in project
+//call CheckIfUserMember first before this
+//then call if user is admin
+const RemoveMember = async (req, res) => {
+    const { assigneeId } = req.body
+    const { projectId } = req.myObject
+    try {
+        const connection = mysql.createConnection({
+            host: '127.0.0.1',
+            user: 'root',
+            password: 'admin123',
+            database: 'bug_tracker',
+            multipleStatements: true,
+        })
+
+        connection.connect((err) => {
+            if (err) throw err
+        })
+
+        const removeMember = () => {
+            return new Promise((resolve, reject) => {
+                connection.query(
+                    `DELETE FROM project_members WHERE project_id = ${projectId} AND member_id = ${assigneeId};`,
+                    (err, results, fields) => {
+                        if (err) reject(err)
+                        resolve(results)
+                        connection.end()
+                    }
+                )
+            })
+        }
+
+        removeMember().then((results) => {
+            console.log(results)
+            if (results.affectedRows > 0) {
+                res.status(200).json({
+                    message: 'Member removed successfully',
+                    success: true,
+                })
+            } else {
+                res.status(500).json({
+                    message: 'User is not in the project',
+                    success: false,
+                })
+            }
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: err.message })
+    }
+}
+
 module.exports = {
     CreateProject,
     CreateProjectMembersCreator,
     CheckIfProjectAdmin,
     CreateProjectMember,
     CheckIfUserInProject,
+    CheckIfUserMember,
+    ChangeMemberRole,
+    RemoveMember,
 }

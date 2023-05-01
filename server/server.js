@@ -8,6 +8,9 @@ const {
     CheckIfProjectAdmin,
     CreateProjectMember,
     CheckIfUserInProject,
+    CheckIfUserMember,
+    ChangeMemberRole,
+    RemoveMember,
 } = require('./crud/projects.controller')
 const app = express()
 const port = 3000
@@ -33,6 +36,19 @@ app.post(
     CheckIfUserInProject,
     CheckIfProjectAdmin,
     CreateProjectMember
+)
+app.post(
+    '/change-role',
+    CheckIfUserMember,
+    CheckIfProjectAdmin,
+    ChangeMemberRole
+)
+
+app.delete(
+    '/remove-member',
+    CheckIfUserMember,
+    CheckIfProjectAdmin,
+    RemoveMember
 )
 
 //this will contain mysql retrieval code
