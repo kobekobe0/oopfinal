@@ -233,4 +233,5 @@ module.exports = {
     UpdateTicket,
     OwnTicket,
     GetUserTicketsByProject,
+    GetTicketsByProject,
 }
