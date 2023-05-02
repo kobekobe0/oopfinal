@@ -11,6 +11,7 @@ const {
     CheckIfUserMember,
     ChangeMemberRole,
     RemoveMember,
+    GetProjectMembers,
 } = require('./crud/projects.controller')
 const {
     CreateTicket,
@@ -69,8 +70,11 @@ app.post('/update-ticket', UpdateTicket)
 app.post('/own-ticket', OwnTicket)
 
 //this will contain mysql retrieval code
+
 //------TICKETS-------//
 app.get('/get-user-tickets', GetUserTicketsByProject)
 app.get('/get-project-tickets', GetTicketsByProject)
 
+//--------PROJECTS--------//
+app.get('/get-project-members', GetProjectMembers)
 //crud operations

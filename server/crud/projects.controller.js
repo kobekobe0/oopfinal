@@ -1,4 +1,11 @@
 const mysql = require('mysql')
+const db = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'admin123',
+    database: 'bug_tracker',
+    multipleStatements: true,
+})
 
 //projects
 //project_members
@@ -397,6 +404,26 @@ const RemoveMember = async (req, res) => {
     }
 }
 
+const GetProjectMembers = async (req, res) => {
+    const { projectId } = req.body
+    try {
+        const query = `SELECT * FROM project_members WHERE project_id = ${projectId};`
+        db.query(query, (err, results, fields) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).json({ message: err.message })
+            }
+            res.status(200).json({
+                message: 'Members fetched successfully',
+                members: results,
+            })
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: err.message })
+    }
+}
+
 module.exports = {
     CreateProject,
     CreateProjectMembersCreator,
@@ -406,4 +433,5 @@ module.exports = {
     CheckIfUserMember,
     ChangeMemberRole,
     RemoveMember,
+    GetProjectMembers,
 }
