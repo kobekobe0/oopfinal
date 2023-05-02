@@ -81,5 +81,32 @@ const DeleteTicket = async (req, res) => {
 //------ALL MEMBERS------//
 //own ticket
 //update ticket // for changing its status
+const UpdateTicket = async (req, res) => {
+    const { userId, ticketId, status } = req.body
+    try {
+        const query = `UPDATE tickets SET status = ${status} WHERE id = ${ticketId}`
+        db.query(query, (err, result) => {
+            if (err) {
+                res.status(500).json({
+                    message: 'Error assigning ticket',
+                    error: err,
+                    success: false,
+                })
+            } else {
+                console.log(result)
+                res.status(200).json({
+                    message: 'Ticket assigned successfully',
+                    success: true,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message: error?.message,
+            success: false,
+        })
+    }
+}
 
 module.exports = { CreateTicket, DeleteTicket }
