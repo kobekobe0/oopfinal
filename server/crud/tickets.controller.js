@@ -1,4 +1,5 @@
 const mysql = require('mysql')
+const { STATUS } = require('../constants')
 
 const db = mysql.createConnection({
     host: '127.0.0.1',
@@ -109,7 +110,9 @@ const AssignTicket = async (req, res) => {
 //own ticket
 //update ticket // for changing its status
 const UpdateTicket = async (req, res) => {
-    const { userId, ticketId, status } = req.body
+    const { ticketId, status } = req.body
+    if (!STATUS.includes(status))
+        return res.status(400).json({ message: 'Invalid status' })
     try {
         const query = `UPDATE tickets SET status = ${status} WHERE id = ${ticketId}`
         db.query(query, (err, result) => {
@@ -137,4 +140,4 @@ const UpdateTicket = async (req, res) => {
 }
 
 //--------QUERIES-------//
-module.exports = { CreateTicket, DeleteTicket }
+module.exports = { CreateTicket, DeleteTicket, AssignTicket, UpdateTicket }
