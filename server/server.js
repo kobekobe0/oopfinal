@@ -12,6 +12,8 @@ const {
     ChangeMemberRole,
     RemoveMember,
     GetProjectMembers,
+    GetUserProjectTemp,
+    GetUserProjects,
 } = require('./crud/projects.controller')
 const {
     CreateTicket,
@@ -77,4 +79,5 @@ app.get('/get-project-tickets', GetTicketsByProject)
 
 //--------PROJECTS--------//
 app.get('/get-project-members', GetProjectMembers)
+app.get('/get-user-projects', GetUserProjectTemp, GetUserProjects)
 //crud operations

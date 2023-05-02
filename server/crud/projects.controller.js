@@ -231,18 +231,12 @@ const CreateProjectMember = async (req, res) => {
         createProjectMemberPromise()
             .then((results) => {
                 console.log(results)
-                if (results.affectedRows > 0) {
-                    res.status(201).json({
-                        message: 'Project member created successfully',
-                        success: true,
-                        member: results,
-                    })
-                } else {
-                    res.status(500).json({
-                        message: 'User is already in the project',
-                        success: false,
-                    })
-                }
+
+                res.status(201).json({
+                    message: 'Project member created successfully',
+                    success: true,
+                    member: results,
+                })
             })
             .catch((err) => {
                 res.status(500).json({ message: err.message })
@@ -424,6 +418,58 @@ const GetProjectMembers = async (req, res) => {
     }
 }
 
+//The next TWO middleware will be called the same time
+const GetUserProjectTemp = async (req, res, next) => {
+    const { userId } = req.body
+    try {
+        const query = `SELECT project_id FROM project_members WHERE member_id = ${userId};`
+        db.query(query, (err, results, fields) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).json({ message: err.message })
+            }
+            //store results as array not individual object
+            req.myObject = { projectIds: results }
+            next()
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message })
+    }
+}
+const GetUserProjects = async (req, res) => {
+    const { projectIds, userId } = req.myObject
+    let projectId = []
+    const convertToArray = () => {
+        return new Promise((resolve, reject) => {
+            projectIds.forEach((project) => {
+                projectId.push(project.project_id)
+            })
+            resolve()
+        })
+    }
+    await convertToArray()
+    let projectIdArr = projectId.join(',')
+    //console.log(projectIdArr)
+    try {
+        const query = `SELECT * FROM projects WHERE id IN (${projectIdArr});`
+        db.query(query, (err, results, fields) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).json({ message: err.message })
+            }
+            console.log(results)
+            res.status(200).json({
+                message: 'Projects fetched successfully',
+                projects: results,
+            })
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: err.message })
+    }
+}
+
 module.exports = {
     CreateProject,
     CreateProjectMembersCreator,
@@ -434,4 +480,6 @@ module.exports = {
     ChangeMemberRole,
     RemoveMember,
     GetProjectMembers,
+    GetUserProjectTemp,
+    GetUserProjects,
 }
