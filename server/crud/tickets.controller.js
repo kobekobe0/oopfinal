@@ -9,7 +9,7 @@ const db = mysql.createConnection({
 })
 
 //------FOR ADMINS------//
-//call CheckIfUserAdmin first before calling this
+//call CheckIfUserAdmin first before calling these
 //add userId in the body
 const CreateTicket = (req, res) => {
     const {
@@ -21,23 +21,65 @@ const CreateTicket = (req, res) => {
         assignee,
         created_by,
     } = req.body //pwede null yung assignee
-    const query = `INSERT INTO tickets (title, description, project_id, priority, status, assignee, created_by) VALUES ("${title}", "${description}", ${projectId}, "${priority}", "${status}", ${assignee}, ${created_by})`
-    db.query(query, (err, result) => {
-        console.log(result)
-        if (err) {
-            console.log(err)
-            res.status(500).json({
-                message: 'Error creating ticket',
-                error: err,
-                success: false,
-            })
-        } else {
-            res.status(200).json({
-                message: 'Ticket created successfully',
-                success: true,
-            })
-        }
-    })
+    try {
+        const query = `INSERT INTO tickets (title, description, project_id, priority, status, assignee, created_by) VALUES ("${title}", "${description}", ${projectId}, "${priority}", "${status}", ${assignee}, ${created_by})`
+        db.query(query, (err, result) => {
+            console.log(result)
+            if (err) {
+                console.log(err)
+                res.status(500).json({
+                    message: 'Error creating ticket',
+                    error: err,
+                    success: false,
+                })
+            } else {
+                res.status(200).json({
+                    message: 'Ticket created successfully',
+                    success: true,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message: error?.message,
+            success: false,
+        })
+    }
 }
 
-module.exports = { CreateTicket }
+//delete ticket
+const DeleteTicket = async (req, res) => {
+    const { userId, ticketId } = req.body
+    try {
+        const query = `DELETE FROM tickets WHERE id = ${ticketId}`
+        db.query(query, (err, result) => {
+            if (err) {
+                res.status(500).json({
+                    message: 'Error deleting ticket',
+                    error: err,
+                    success: false,
+                })
+            } else {
+                console.log(result)
+                res.status(200).json({
+                    message: 'Ticket deleted successfully',
+                    success: true,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message: error?.message,
+            success: false,
+        })
+    }
+}
+//assign ticket
+
+//------ALL MEMBERS------//
+//own ticket
+//update ticket // for changing its status
+
+module.exports = { CreateTicket, DeleteTicket }

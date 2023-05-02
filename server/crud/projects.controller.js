@@ -175,7 +175,7 @@ const CheckIfProjectAdmin = async (req, res, next) => {
         }
 
         checkRole().then((results) => {
-            if (results.role == 'ADMIN') {
+            if (results?.role == 'ADMIN') {
                 req.myObject = {
                     projectId,
                 }

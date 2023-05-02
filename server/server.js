@@ -12,7 +12,7 @@ const {
     ChangeMemberRole,
     RemoveMember,
 } = require('./crud/projects.controller')
-const { CreateTicket } = require('./crud/tickets.controller')
+const { CreateTicket, DeleteTicket } = require('./crud/tickets.controller')
 const app = express()
 const port = 3000
 
@@ -54,6 +54,7 @@ app.delete(
 
 //----Tickets----//
 app.post('/create-ticket', CheckIfProjectAdmin, CreateTicket)
+app.delete('/delete-ticket', CheckIfProjectAdmin, DeleteTicket)
 
 //this will contain mysql retrieval code
 //crud operations
