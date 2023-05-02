@@ -77,6 +77,33 @@ const DeleteTicket = async (req, res) => {
     }
 }
 //assign ticket
+const AssignTicket = async (req, res) => {
+    const { assigneeId, ticketId, userId } = req.body
+    try {
+        const query = `UPDATE tickets SET assignee = ${assigneeId} WHERE id = ${ticketId}`
+        db.query(query, (err, result) => {
+            if (err) {
+                res.status(500).json({
+                    message: 'Error assigning ticket',
+                    error: err,
+                    success: false,
+                })
+            } else {
+                console.log(result)
+                res.status(200).json({
+                    message: 'Ticket assigned successfully',
+                    success: true,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message: error?.message,
+            success: false,
+        })
+    }
+}
 
 //------ALL MEMBERS------//
 //own ticket
@@ -109,4 +136,5 @@ const UpdateTicket = async (req, res) => {
     }
 }
 
+//--------QUERIES-------//
 module.exports = { CreateTicket, DeleteTicket }
