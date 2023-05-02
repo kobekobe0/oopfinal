@@ -168,6 +168,35 @@ const UpdateTicket = async (req, res) => {
 }
 
 //--------QUERIES-------//
+const GetUserTicketsByProject = async (req, res) => {
+    const { userId, projectId } = req.body
+    try {
+        const query = `SELECT * FROM tickets WHERE project_id = ${projectId} AND assignee = ${userId}`
+        db.query(query, (err, result) => {
+            if (err) {
+                res.status(500).json({
+                    message: 'Error getting tickets',
+                    error: err,
+                    success: false,
+                })
+            } else {
+                console.log(result)
+                res.status(200).json({
+                    message: 'Tickets retrieved successfully',
+                    success: true,
+                    data: result,
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(501).json({
+            message: error?.message,
+            success: false,
+        })
+    }
+}
+
 module.exports = {
     CreateTicket,
     DeleteTicket,
