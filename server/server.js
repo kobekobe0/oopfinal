@@ -18,6 +18,7 @@ const {
     AssignTicket,
     UpdateTicket,
     OwnTicket,
+    GetUserTicketsByProject,
 } = require('./crud/tickets.controller')
 const app = express()
 const port = 3000
@@ -67,4 +68,7 @@ app.post('/update-ticket', UpdateTicket)
 app.post('/own-ticket', OwnTicket)
 
 //this will contain mysql retrieval code
+//------TICKETS-------//
+app.get('/get-user-tickets', GetUserTicketsByProject)
+
 //crud operations
