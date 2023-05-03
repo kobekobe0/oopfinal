@@ -1,5 +1,5 @@
 const express = require('express')
-const { CreateUser, LoginUser } = require('./crud/users.controller')
+const { CreateUser, LoginUser, GetUsers } = require('./crud/users.controller')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const {
@@ -80,4 +80,7 @@ app.get('/get-project-tickets', GetTicketsByProject)
 //--------PROJECTS--------//
 app.get('/get-project-members', GetProjectMembers)
 app.get('/get-user-projects', GetUserProjectTemp, GetUserProjects)
+
+//------USERS------//
+app.get('/get-users', GetUsers)
 //crud operations

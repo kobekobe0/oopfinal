@@ -1,5 +1,13 @@
 const mysql = require('mysql')
 
+const db = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'admin123',
+    database: 'bug_tracker',
+    multipleStatements: true,
+})
+
 const CreateUser = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body
     try {
@@ -93,5 +101,28 @@ const LoginUser = async (req, res) => {
 }
 
 //search user
+const GetUsers = async (req, res) => {
+    const { userName } = req.body
+    try {
+        const query = `SELECT * FROM users WHERE name LIKE '%${userName}%'`
+        db.query(query, (err, result) => {
+            if (err) {
+                res.status(500).json({
+                    message: 'Error searching user',
+                    error: err,
+                    success: false,
+                })
+            }
+            res.status(200).json({
+                message: 'User found',
+                success: true,
+                data: result,
+            })
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message })
+    }
+}
 
-module.exports = { CreateUser, LoginUser }
+module.exports = { CreateUser, LoginUser, GetUsers }
